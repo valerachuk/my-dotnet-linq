@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Xunit;
+using MyLinq;
 
 namespace System.Linq.Tests
 {
@@ -33,7 +34,7 @@ namespace System.Linq.Tests
 
             var q = from x3 in q1 from x4 in q2 select new { a1 = x3, a2 = x4 };
 
-            Assert.Equal(q.Select(e => e.a1), q.Select(e => e.a1));
+            Assert.Equal(q.MySelect(e => e.a1), q.MySelect(e => e.a1));
         }
 
         [Fact]
@@ -42,7 +43,7 @@ namespace System.Linq.Tests
             var source = new[] { new { name = "Prakash", custID = 98088 } };
             string[] expected = { "Prakash" };
 
-            Assert.Equal(expected, source.Select(e => e.name));
+            Assert.Equal(expected, source.MySelect(e => e.name));
         }
 
         [Fact]
@@ -57,7 +58,7 @@ namespace System.Linq.Tests
                 new { name = "Prakash", custID = 39030 }
             };
             string[] expected = { "Prakash", "Bob", "Chris", null, "Prakash" };
-            Assert.Equal(expected, source.Select(e => e.name));
+            Assert.Equal(expected, source.MySelect(e => e.name));
         }
 
         [Fact]
@@ -72,9 +73,9 @@ namespace System.Linq.Tests
                 new { name = "Prakash", custID = 39030 }
             };
             string[] expected = { "Prakash", "Bob", "Chris", null, "Prakash" };
-            Assert.Equal(expected, source.RunOnce().Select(e => e.name));
-            Assert.Equal(expected, source.ToArray().RunOnce().Select(e => e.name));
-            Assert.Equal(expected, source.ToList().RunOnce().Select(e => e.name));
+            Assert.Equal(expected, source.RunOnce().MySelect(e => e.name));
+            Assert.Equal(expected, source.ToArray().RunOnce().MySelect(e => e.name));
+            Assert.Equal(expected, source.ToList().RunOnce().MySelect(e => e.name));
         }
 
         [Fact]
@@ -82,7 +83,7 @@ namespace System.Linq.Tests
         {
             Assert.Equal(
                 Enumerable.Empty<int>(),
-                Enumerable.Empty<string>().Select((s, i) => s.Length + i)
+                Enumerable.Empty<string>().MySelect((s, i) => s.Length + i)
             );
         }
 
@@ -92,7 +93,7 @@ namespace System.Linq.Tests
             var source = new[] { new { name = "Prakash", custID = 98088 } };
             string[] expected = { "Prakash" };
 
-            Assert.Equal(expected, source.Select((e, index) => e.name));
+            Assert.Equal(expected, source.MySelect((e, index) => e.name));
         }
 
         [Fact]
@@ -107,7 +108,7 @@ namespace System.Linq.Tests
                 new { name = "Prakash", custID = 39030 }
             };
             string[] expected = { "Prakash", "Bob", "Chris", null, "Prakash" };
-            Assert.Equal(expected, source.Select((e, i) => e.name));
+            Assert.Equal(expected, source.MySelect((e, i) => e.name));
         }
 
         [Fact]
@@ -120,7 +121,7 @@ namespace System.Linq.Tests
                 new { name = "Chris", custID = 39033 }
             };
             string[] expected = { "Prakash", null, null };
-            Assert.Equal(expected, source.Select((e, i) => i == 0 ? e.name : null));
+            Assert.Equal(expected, source.MySelect((e, i) => i == 0 ? e.name : null));
         }
 
         [Fact]
@@ -136,7 +137,7 @@ namespace System.Linq.Tests
                 new { name = "Chuck", custID = 39033 }
             };
             string[] expected = { null, null, null, null, null, "Chuck" };
-            Assert.Equal(expected, source.Select((e, i) => i == 5 ? e.name : null));
+            Assert.Equal(expected, source.MySelect((e, i) => i == 5 ? e.name : null));
         }
 
         [Fact]
@@ -145,7 +146,10 @@ namespace System.Linq.Tests
             IEnumerable<int> source = null;
             Func<int, int> selector = i => i + 1;
 
-            AssertExtensions.Throws<ArgumentNullException>("source", () => source.Select(selector));
+            AssertExtensions.Throws<ArgumentNullException>(
+                "source",
+                () => source.MySelect(selector)
+            );
         }
 
         [Fact]
@@ -156,7 +160,7 @@ namespace System.Linq.Tests
 
             AssertExtensions.Throws<ArgumentNullException>(
                 "selector",
-                () => source.Select(selector)
+                () => source.MySelect(selector)
             );
         }
 
@@ -166,7 +170,10 @@ namespace System.Linq.Tests
             IEnumerable<int> source = null;
             Func<int, int, int> selector = (e, i) => i + 1;
 
-            AssertExtensions.Throws<ArgumentNullException>("source", () => source.Select(selector));
+            AssertExtensions.Throws<ArgumentNullException>(
+                "source",
+                () => source.MySelect(selector)
+            );
         }
 
         [Fact]
@@ -177,7 +184,7 @@ namespace System.Linq.Tests
 
             AssertExtensions.Throws<ArgumentNullException>(
                 "selector",
-                () => source.Select(selector)
+                () => source.MySelect(selector)
             );
         }
 
@@ -194,7 +201,7 @@ namespace System.Linq.Tests
                 }
             };
 
-            IEnumerable<int> query = source.Select(d => d());
+            IEnumerable<int> query = source.MySelect(d => d());
             Assert.False(funcCalled);
         }
 
@@ -211,7 +218,7 @@ namespace System.Linq.Tests
                 }
             };
 
-            IEnumerable<int> query = source.Select(d => d());
+            IEnumerable<int> query = source.MySelect(d => d());
             Assert.False(funcCalled);
         }
 
@@ -230,7 +237,7 @@ namespace System.Linq.Tests
                 }
             );
 
-            IEnumerable<int> query = source.Select(d => d());
+            IEnumerable<int> query = source.MySelect(d => d());
             Assert.False(funcCalled);
         }
 
@@ -249,7 +256,7 @@ namespace System.Linq.Tests
                 }
             );
 
-            IEnumerable<int> query = source.Select(d => d());
+            IEnumerable<int> query = source.MySelect(d => d());
             Assert.False(funcCalled);
         }
 
@@ -268,7 +275,7 @@ namespace System.Linq.Tests
                 1
             );
 
-            IEnumerable<int> query = source.Select(d => d());
+            IEnumerable<int> query = source.MySelect(d => d());
             Assert.False(funcCalled);
         }
 
@@ -285,7 +292,7 @@ namespace System.Linq.Tests
                 }
             };
 
-            IEnumerable<int> query = source.Select(d => d).Select(d => d());
+            IEnumerable<int> query = source.MySelect(d => d).MySelect(d => d());
             Assert.False(funcCalled);
         }
 
@@ -302,7 +309,7 @@ namespace System.Linq.Tests
                 }
             };
 
-            IEnumerable<int> query = source.Select(d => d).Select(d => d());
+            IEnumerable<int> query = source.MySelect(d => d).MySelect(d => d());
             Assert.False(funcCalled);
         }
 
@@ -321,7 +328,7 @@ namespace System.Linq.Tests
                 }
             );
 
-            IEnumerable<int> query = source.Select(d => d).Select(d => d());
+            IEnumerable<int> query = source.MySelect(d => d).MySelect(d => d());
             Assert.False(funcCalled);
         }
 
@@ -340,7 +347,7 @@ namespace System.Linq.Tests
                 }
             );
 
-            IEnumerable<int> query = source.Select(d => d).Select(d => d());
+            IEnumerable<int> query = source.MySelect(d => d).MySelect(d => d());
             Assert.False(funcCalled);
         }
 
@@ -359,7 +366,7 @@ namespace System.Linq.Tests
                 1
             );
 
-            IEnumerable<int> query = source.Select(d => d).Select(d => d());
+            IEnumerable<int> query = source.MySelect(d => d).MySelect(d => d());
             Assert.False(funcCalled);
         }
 
@@ -369,7 +376,7 @@ namespace System.Linq.Tests
             int[] source = new[] { 1, 2, 3, 4, 5 };
             Func<int, int> selector = i => i + 1;
 
-            IEnumerable<int> query = source.Select(selector);
+            IEnumerable<int> query = source.MySelect(selector);
 
             int index = 0;
             foreach (var item in query)
@@ -388,7 +395,7 @@ namespace System.Linq.Tests
             List<int> source = new List<int> { 1, 2, 3, 4, 5 };
             Func<int, int> selector = i => i + 1;
 
-            IEnumerable<int> query = source.Select(selector);
+            IEnumerable<int> query = source.MySelect(selector);
 
             int index = 0;
             foreach (var item in query)
@@ -409,7 +416,7 @@ namespace System.Linq.Tests
             );
             Func<int, int> selector = i => i + 1;
 
-            IEnumerable<int> query = source.Select(selector);
+            IEnumerable<int> query = source.MySelect(selector);
 
             int index = 0;
             foreach (var item in query)
@@ -428,7 +435,7 @@ namespace System.Linq.Tests
             ICollection<int> source = new LinkedList<int>(new List<int> { 1, 2, 3, 4, 5 });
             Func<int, int> selector = i => i + 1;
 
-            IEnumerable<int> query = source.Select(selector);
+            IEnumerable<int> query = source.MySelect(selector);
 
             int index = 0;
             foreach (var item in query)
@@ -448,7 +455,7 @@ namespace System.Linq.Tests
             IEnumerable<int> source = Enumerable.Range(1, nbOfItems);
             Func<int, int> selector = i => i + 1;
 
-            IEnumerable<int> query = source.Select(selector);
+            IEnumerable<int> query = source.MySelect(selector);
 
             int index = 0;
             foreach (var item in query)
@@ -467,7 +474,7 @@ namespace System.Linq.Tests
             int[] source = new[] { 1 };
             Func<int, int> selector = i => i + 1;
 
-            IEnumerable<int> query = source.Select(selector);
+            IEnumerable<int> query = source.MySelect(selector);
 
             var enumerator = query.GetEnumerator();
             while (enumerator.MoveNext())
@@ -482,7 +489,7 @@ namespace System.Linq.Tests
             List<int> source = new List<int>() { 1 };
             Func<int, int> selector = i => i + 1;
 
-            IEnumerable<int> query = source.Select(selector);
+            IEnumerable<int> query = source.MySelect(selector);
 
             var enumerator = query.GetEnumerator();
             while (enumerator.MoveNext())
@@ -497,7 +504,7 @@ namespace System.Linq.Tests
             IReadOnlyCollection<int> source = new ReadOnlyCollection<int>(new List<int>() { 1 });
             Func<int, int> selector = i => i + 1;
 
-            IEnumerable<int> query = source.Select(selector);
+            IEnumerable<int> query = source.MySelect(selector);
 
             var enumerator = query.GetEnumerator();
             while (enumerator.MoveNext())
@@ -512,7 +519,7 @@ namespace System.Linq.Tests
             ICollection<int> source = new LinkedList<int>(new List<int>() { 1 });
             Func<int, int> selector = i => i + 1;
 
-            IEnumerable<int> query = source.Select(selector);
+            IEnumerable<int> query = source.MySelect(selector);
 
             var enumerator = query.GetEnumerator();
             while (enumerator.MoveNext())
@@ -527,7 +534,7 @@ namespace System.Linq.Tests
             IEnumerable<int> source = Enumerable.Repeat(1, 1);
             Func<int, int> selector = i => i + 1;
 
-            IEnumerable<int> query = source.Select(selector);
+            IEnumerable<int> query = source.MySelect(selector);
 
             var enumerator = query.GetEnumerator();
             while (enumerator.MoveNext())
@@ -542,7 +549,7 @@ namespace System.Linq.Tests
             Func<int, int> selector = i => i + 1;
             int[] source = new[] { 1, 2, 3, 4, 5 };
 
-            IEnumerable<int> query = source.Select(selector).Select(selector);
+            IEnumerable<int> query = source.MySelect(selector).MySelect(selector);
 
             int index = 0;
             foreach (var item in query)
@@ -561,7 +568,7 @@ namespace System.Linq.Tests
             List<int> source = new List<int> { 1, 2, 3, 4, 5 };
             Func<int, int> selector = i => i + 1;
 
-            IEnumerable<int> query = source.Select(selector).Select(selector);
+            IEnumerable<int> query = source.MySelect(selector).MySelect(selector);
 
             int index = 0;
             foreach (var item in query)
@@ -582,7 +589,7 @@ namespace System.Linq.Tests
             );
             Func<int, int> selector = i => i + 1;
 
-            IEnumerable<int> query = source.Select(selector).Select(selector);
+            IEnumerable<int> query = source.MySelect(selector).MySelect(selector);
 
             int index = 0;
             foreach (var item in query)
@@ -601,7 +608,7 @@ namespace System.Linq.Tests
             ICollection<int> source = new LinkedList<int>(new List<int> { 1, 2, 3, 4, 5 });
             Func<int, int> selector = i => i + 1;
 
-            IEnumerable<int> query = source.Select(selector).Select(selector);
+            IEnumerable<int> query = source.MySelect(selector).MySelect(selector);
 
             int index = 0;
             foreach (var item in query)
@@ -621,7 +628,7 @@ namespace System.Linq.Tests
             IEnumerable<int> source = Enumerable.Range(1, 5);
             Func<int, int> selector = i => i + 1;
 
-            IEnumerable<int> query = source.Select(selector).Select(selector);
+            IEnumerable<int> query = source.MySelect(selector).MySelect(selector);
 
             int index = 0;
             foreach (var item in query)
@@ -640,7 +647,7 @@ namespace System.Linq.Tests
             IEnumerable<int> source = Enumerable.Empty<int>();
             bool wasSelectorCalled = false;
 
-            IEnumerable<int> result = source.Select(i =>
+            IEnumerable<int> result = source.MySelect(i =>
             {
                 wasSelectorCalled = true;
                 return i + 1;
@@ -665,7 +672,7 @@ namespace System.Linq.Tests
                 throw new InvalidOperationException();
             };
 
-            var result = source.Select(selector);
+            var result = source.MySelect(selector);
             var enumerator = result.GetEnumerator();
 
             Assert.Throws<InvalidOperationException>(() => enumerator.MoveNext());
@@ -682,7 +689,7 @@ namespace System.Linq.Tests
                 return i + 1;
             };
 
-            var result = source.Select(selector);
+            var result = source.MySelect(selector);
             var enumerator = result.GetEnumerator();
 
             Assert.Throws<InvalidOperationException>(() => enumerator.MoveNext());
@@ -700,7 +707,7 @@ namespace System.Linq.Tests
             IEnumerable<int> source = new ThrowsOnCurrent();
             Func<int, int> selector = i => i + 1;
 
-            var result = source.Select(selector);
+            var result = source.MySelect(selector);
             var enumerator = result.GetEnumerator();
 
             Assert.Throws<InvalidOperationException>(() => enumerator.MoveNext());
@@ -712,7 +719,7 @@ namespace System.Linq.Tests
             IEnumerable<int> source = new ThrowsOnCurrent();
             Func<int, int> selector = i => i + 1;
 
-            var result = source.Select(selector);
+            var result = source.MySelect(selector);
             var enumerator = result.GetEnumerator();
 
             Assert.Throws<InvalidOperationException>(() => enumerator.MoveNext());
@@ -747,7 +754,7 @@ namespace System.Linq.Tests
             IEnumerable<int> source = new ThrowsOnMoveNext();
             Func<int, int> selector = i => i + 1;
 
-            var result = source.Select(selector);
+            var result = source.MySelect(selector);
             var enumerator = result.GetEnumerator();
 
             Assert.Throws<InvalidOperationException>(() => enumerator.MoveNext());
@@ -759,7 +766,7 @@ namespace System.Linq.Tests
             IEnumerable<int> source = new ThrowsOnMoveNext();
             Func<int, int> selector = i => i + 1;
 
-            var result = source.Select(selector);
+            var result = source.MySelect(selector);
             var enumerator = result.GetEnumerator();
 
             Assert.Throws<InvalidOperationException>(() => enumerator.MoveNext());
@@ -777,7 +784,7 @@ namespace System.Linq.Tests
             IEnumerable<int> source = new ThrowsOnGetEnumerator();
             Func<int, int> selector = i => i + 1;
 
-            var result = source.Select(selector);
+            var result = source.MySelect(selector);
             var enumerator = result.GetEnumerator();
 
             Assert.Throws<InvalidOperationException>(() => enumerator.MoveNext());
@@ -789,7 +796,7 @@ namespace System.Linq.Tests
             IEnumerable<int> source = new ThrowsOnGetEnumerator();
             Func<int, string> selector = i => i.ToString();
 
-            var result = source.Select(selector);
+            var result = source.MySelect(selector);
             var enumerator = result.GetEnumerator();
 
             Assert.Throws<InvalidOperationException>(() => enumerator.MoveNext());
@@ -806,7 +813,7 @@ namespace System.Linq.Tests
             List<int> source = new List<int>() { 1, 2, 3, 4, 5 };
             Func<int, int> selector = i => i + 1;
 
-            var result = source.Select(selector);
+            var result = source.MySelect(selector);
             var enumerator = result.GetEnumerator();
 
             Assert.True(enumerator.MoveNext());
@@ -824,7 +831,7 @@ namespace System.Linq.Tests
         public void Select_GetEnumeratorCalledTwice_DifferentInstancesReturned()
         {
             int[] source = new[] { 1, 2, 3, 4, 5 };
-            var query = source.Select(i => i + 1);
+            var query = source.MySelect(i => i + 1);
 
             var enumerator1 = query.GetEnumerator();
             var enumerator2 = query.GetEnumerator();
@@ -842,7 +849,7 @@ namespace System.Linq.Tests
             int[] source = new[] { 1, 2, 3, 4, 5 };
             Func<int, int> selector = i => i + 1;
 
-            IEnumerable<int> result = source.Select(selector);
+            IEnumerable<int> result = source.MySelect(selector);
             IEnumerator<int> enumerator = result.GetEnumerator();
 
             Assert.Throws<NotSupportedException>(() => enumerator.Reset());
@@ -851,7 +858,7 @@ namespace System.Linq.Tests
         [Fact]
         public void ForcedToEnumeratorDoesntEnumerate()
         {
-            var iterator = NumberRangeGuaranteedNotCollectionType(0, 3).Select(i => i);
+            var iterator = NumberRangeGuaranteedNotCollectionType(0, 3).MySelect(i => i);
             // Don't insist on this behaviour, but check it's correct if it happens
             var en = iterator as IEnumerator<int>;
             Assert.False(en != null && en.MoveNext());
@@ -860,7 +867,7 @@ namespace System.Linq.Tests
         [Fact]
         public void ForcedToEnumeratorDoesntEnumerateIndexed()
         {
-            var iterator = NumberRangeGuaranteedNotCollectionType(0, 3).Select((e, i) => i);
+            var iterator = NumberRangeGuaranteedNotCollectionType(0, 3).MySelect((e, i) => i);
             // Don't insist on this behaviour, but check it's correct if it happens
             var en = iterator as IEnumerator<int>;
             Assert.False(en != null && en.MoveNext());
@@ -869,7 +876,7 @@ namespace System.Linq.Tests
         [Fact]
         public void ForcedToEnumeratorDoesntEnumerateArray()
         {
-            var iterator = NumberRangeGuaranteedNotCollectionType(0, 3).ToArray().Select(i => i);
+            var iterator = NumberRangeGuaranteedNotCollectionType(0, 3).ToArray().MySelect(i => i);
             var en = iterator as IEnumerator<int>;
             Assert.False(en != null && en.MoveNext());
         }
@@ -877,7 +884,7 @@ namespace System.Linq.Tests
         [Fact]
         public void ForcedToEnumeratorDoesntEnumerateList()
         {
-            var iterator = NumberRangeGuaranteedNotCollectionType(0, 3).ToList().Select(i => i);
+            var iterator = NumberRangeGuaranteedNotCollectionType(0, 3).ToList().MySelect(i => i);
             var en = iterator as IEnumerator<int>;
             Assert.False(en != null && en.MoveNext());
         }
@@ -888,7 +895,7 @@ namespace System.Linq.Tests
             var iterator = NumberRangeGuaranteedNotCollectionType(0, 3)
                 .ToList()
                 .AsReadOnly()
-                .Select(i => i);
+                .MySelect(i => i);
             var en = iterator as IEnumerator<int>;
             Assert.False(en != null && en.MoveNext());
         }
@@ -899,7 +906,7 @@ namespace System.Linq.Tests
             var iterator = NumberRangeGuaranteedNotCollectionType(0, 3)
                 .ToList()
                 .AsReadOnly()
-                .Select(i => i)
+                .MySelect(i => i)
                 .Skip(1);
             var en = iterator as IEnumerator<int>;
             Assert.False(en != null && en.MoveNext());
@@ -909,27 +916,27 @@ namespace System.Linq.Tests
         public void Select_SourceIsArray_Count()
         {
             var source = new[] { 1, 2, 3, 4 };
-            Assert.Equal(source.Length, source.Select(i => i * 2).Count());
+            Assert.Equal(source.Length, source.MySelect(i => i * 2).Count());
         }
 
         [Fact]
         public void Select_SourceIsAList_Count()
         {
             var source = new List<int> { 1, 2, 3, 4 };
-            Assert.Equal(source.Count, source.Select(i => i * 2).Count());
+            Assert.Equal(source.Count, source.MySelect(i => i * 2).Count());
         }
 
         [Fact]
         public void Select_SourceIsAnIList_Count()
         {
             var source = new List<int> { 1, 2, 3, 4 }.AsReadOnly();
-            Assert.Equal(source.Count, source.Select(i => i * 2).Count());
+            Assert.Equal(source.Count, source.MySelect(i => i * 2).Count());
         }
 
         [Fact]
         public void Select_SourceIsArray_Skip()
         {
-            var source = new[] { 1, 2, 3, 4 }.Select(i => i * 2);
+            var source = new[] { 1, 2, 3, 4 }.MySelect(i => i * 2);
             Assert.Equal(new[] { 6, 8 }, source.Skip(2));
             Assert.Equal(new[] { 6, 8 }, source.Skip(2).Skip(-1));
             Assert.Equal(new[] { 6, 8 }, source.Skip(1).Skip(1));
@@ -941,7 +948,7 @@ namespace System.Linq.Tests
         [Fact]
         public void Select_SourceIsList_Skip()
         {
-            var source = new List<int> { 1, 2, 3, 4 }.Select(i => i * 2);
+            var source = new List<int> { 1, 2, 3, 4 }.MySelect(i => i * 2);
             Assert.Equal(new[] { 6, 8 }, source.Skip(2));
             Assert.Equal(new[] { 6, 8 }, source.Skip(2).Skip(-1));
             Assert.Equal(new[] { 6, 8 }, source.Skip(1).Skip(1));
@@ -955,7 +962,7 @@ namespace System.Linq.Tests
         {
             var source = new List<int> { 1, 2, 3, 4 }
                 .AsReadOnly()
-                .Select(i => i * 2);
+                .MySelect(i => i * 2);
             Assert.Equal(new[] { 6, 8 }, source.Skip(2));
             Assert.Equal(new[] { 6, 8 }, source.Skip(2).Skip(-1));
             Assert.Equal(new[] { 6, 8 }, source.Skip(1).Skip(1));
@@ -967,7 +974,7 @@ namespace System.Linq.Tests
         [Fact]
         public void Select_SourceIsArray_Take()
         {
-            var source = new[] { 1, 2, 3, 4 }.Select(i => i * 2);
+            var source = new[] { 1, 2, 3, 4 }.MySelect(i => i * 2);
             Assert.Equal(new[] { 2, 4 }, source.Take(2));
             Assert.Equal(new[] { 2, 4 }, source.Take(3).Take(2));
             Assert.Empty(source.Take(-1));
@@ -982,7 +989,7 @@ namespace System.Linq.Tests
         [Fact]
         public void Select_SourceIsList_Take()
         {
-            var source = new List<int> { 1, 2, 3, 4 }.Select(i => i * 2);
+            var source = new List<int> { 1, 2, 3, 4 }.MySelect(i => i * 2);
             Assert.Equal(new[] { 2, 4 }, source.Take(2));
             Assert.Equal(new[] { 2, 4 }, source.Take(3).Take(2));
             Assert.Empty(source.Take(-1));
@@ -999,7 +1006,7 @@ namespace System.Linq.Tests
         {
             var source = new List<int> { 1, 2, 3, 4 }
                 .AsReadOnly()
-                .Select(i => i * 2);
+                .MySelect(i => i * 2);
             Assert.Equal(new[] { 2, 4 }, source.Take(2));
             Assert.Equal(new[] { 2, 4 }, source.Take(3).Take(2));
             Assert.Empty(source.Take(-1));
@@ -1014,7 +1021,7 @@ namespace System.Linq.Tests
         [Fact]
         public void Select_SourceIsArray_ElementAt()
         {
-            var source = new[] { 1, 2, 3, 4 }.Select(i => i * 2);
+            var source = new[] { 1, 2, 3, 4 }.MySelect(i => i * 2);
             for (int i = 0; i != 4; ++i)
                 Assert.Equal(i * 2 + 2, source.ElementAt(i));
             AssertExtensions.Throws<ArgumentOutOfRangeException>(
@@ -1040,7 +1047,7 @@ namespace System.Linq.Tests
         [Fact]
         public void Select_SourceIsList_ElementAt()
         {
-            var source = new List<int> { 1, 2, 3, 4 }.Select(i => i * 2);
+            var source = new List<int> { 1, 2, 3, 4 }.MySelect(i => i * 2);
             for (int i = 0; i != 4; ++i)
                 Assert.Equal(i * 2 + 2, source.ElementAt(i));
             AssertExtensions.Throws<ArgumentOutOfRangeException>(
@@ -1068,7 +1075,7 @@ namespace System.Linq.Tests
         {
             var source = new List<int> { 1, 2, 3, 4 }
                 .AsReadOnly()
-                .Select(i => i * 2);
+                .MySelect(i => i * 2);
             for (int i = 0; i != 4; ++i)
                 Assert.Equal(i * 2 + 2, source.ElementAt(i));
             AssertExtensions.Throws<ArgumentOutOfRangeException>(
@@ -1094,7 +1101,7 @@ namespace System.Linq.Tests
         [Fact]
         public void Select_SourceIsArray_ElementAtOrDefault()
         {
-            var source = new[] { 1, 2, 3, 4 }.Select(i => i * 2);
+            var source = new[] { 1, 2, 3, 4 }.MySelect(i => i * 2);
             for (int i = 0; i != 4; ++i)
                 Assert.Equal(i * 2 + 2, source.ElementAtOrDefault(i));
             Assert.Equal(0, source.ElementAtOrDefault(-1));
@@ -1108,7 +1115,7 @@ namespace System.Linq.Tests
         [Fact]
         public void Select_SourceIsList_ElementAtOrDefault()
         {
-            var source = new List<int> { 1, 2, 3, 4 }.Select(i => i * 2);
+            var source = new List<int> { 1, 2, 3, 4 }.MySelect(i => i * 2);
             for (int i = 0; i != 4; ++i)
                 Assert.Equal(i * 2 + 2, source.ElementAtOrDefault(i));
             Assert.Equal(0, source.ElementAtOrDefault(-1));
@@ -1124,7 +1131,7 @@ namespace System.Linq.Tests
         {
             var source = new List<int> { 1, 2, 3, 4 }
                 .AsReadOnly()
-                .Select(i => i * 2);
+                .MySelect(i => i * 2);
             for (int i = 0; i != 4; ++i)
                 Assert.Equal(i * 2 + 2, source.ElementAtOrDefault(i));
             Assert.Equal(0, source.ElementAtOrDefault(-1));
@@ -1138,7 +1145,7 @@ namespace System.Linq.Tests
         [Fact]
         public void Select_SourceIsArray_First()
         {
-            var source = new[] { 1, 2, 3, 4 }.Select(i => i * 2);
+            var source = new[] { 1, 2, 3, 4 }.MySelect(i => i * 2);
             Assert.Equal(2, source.First());
             Assert.Equal(2, source.FirstOrDefault());
 
@@ -1149,7 +1156,7 @@ namespace System.Linq.Tests
             Assert.Equal(0, source.Skip(4).FirstOrDefault());
             Assert.Equal(0, source.Skip(14).FirstOrDefault());
 
-            var empty = new int[0].Select(i => i * 2);
+            var empty = new int[0].MySelect(i => i * 2);
             Assert.Throws<InvalidOperationException>(() => empty.First());
             Assert.Equal(0, empty.FirstOrDefault());
         }
@@ -1157,7 +1164,7 @@ namespace System.Linq.Tests
         [Fact]
         public void Select_SourceIsList_First()
         {
-            var source = new List<int> { 1, 2, 3, 4 }.Select(i => i * 2);
+            var source = new List<int> { 1, 2, 3, 4 }.MySelect(i => i * 2);
             Assert.Equal(2, source.First());
             Assert.Equal(2, source.FirstOrDefault());
 
@@ -1168,7 +1175,7 @@ namespace System.Linq.Tests
             Assert.Equal(0, source.Skip(4).FirstOrDefault());
             Assert.Equal(0, source.Skip(14).FirstOrDefault());
 
-            var empty = new List<int>().Select(i => i * 2);
+            var empty = new List<int>().MySelect(i => i * 2);
             Assert.Throws<InvalidOperationException>(() => empty.First());
             Assert.Equal(0, empty.FirstOrDefault());
         }
@@ -1178,7 +1185,7 @@ namespace System.Linq.Tests
         {
             var source = new List<int> { 1, 2, 3, 4 }
                 .AsReadOnly()
-                .Select(i => i * 2);
+                .MySelect(i => i * 2);
             Assert.Equal(2, source.First());
             Assert.Equal(2, source.FirstOrDefault());
 
@@ -1189,7 +1196,7 @@ namespace System.Linq.Tests
             Assert.Equal(0, source.Skip(4).FirstOrDefault());
             Assert.Equal(0, source.Skip(14).FirstOrDefault());
 
-            var empty = new List<int>().AsReadOnly().Select(i => i * 2);
+            var empty = new List<int>().AsReadOnly().MySelect(i => i * 2);
             Assert.Throws<InvalidOperationException>(() => empty.First());
             Assert.Equal(0, empty.FirstOrDefault());
         }
@@ -1197,14 +1204,14 @@ namespace System.Linq.Tests
         [Fact]
         public void Select_SourceIsArray_Last()
         {
-            var source = new[] { 1, 2, 3, 4 }.Select(i => i * 2);
+            var source = new[] { 1, 2, 3, 4 }.MySelect(i => i * 2);
             Assert.Equal(8, source.Last());
             Assert.Equal(8, source.LastOrDefault());
 
             Assert.Equal(6, source.Take(3).Last());
             Assert.Equal(6, source.Take(3).LastOrDefault());
 
-            var empty = new int[0].Select(i => i * 2);
+            var empty = new int[0].MySelect(i => i * 2);
             Assert.Throws<InvalidOperationException>(() => empty.Last());
             Assert.Equal(0, empty.LastOrDefault());
             Assert.Throws<InvalidOperationException>(() => empty.Skip(1).Last());
@@ -1214,14 +1221,14 @@ namespace System.Linq.Tests
         [Fact]
         public void Select_SourceIsList_Last()
         {
-            var source = new List<int> { 1, 2, 3, 4 }.Select(i => i * 2);
+            var source = new List<int> { 1, 2, 3, 4 }.MySelect(i => i * 2);
             Assert.Equal(8, source.Last());
             Assert.Equal(8, source.LastOrDefault());
 
             Assert.Equal(6, source.Take(3).Last());
             Assert.Equal(6, source.Take(3).LastOrDefault());
 
-            var empty = new List<int>().Select(i => i * 2);
+            var empty = new List<int>().MySelect(i => i * 2);
             Assert.Throws<InvalidOperationException>(() => empty.Last());
             Assert.Equal(0, empty.LastOrDefault());
             Assert.Throws<InvalidOperationException>(() => empty.Skip(1).Last());
@@ -1233,14 +1240,14 @@ namespace System.Linq.Tests
         {
             var source = new List<int> { 1, 2, 3, 4 }
                 .AsReadOnly()
-                .Select(i => i * 2);
+                .MySelect(i => i * 2);
             Assert.Equal(8, source.Last());
             Assert.Equal(8, source.LastOrDefault());
 
             Assert.Equal(6, source.Take(3).Last());
             Assert.Equal(6, source.Take(3).LastOrDefault());
 
-            var empty = new List<int>().AsReadOnly().Select(i => i * 2);
+            var empty = new List<int>().AsReadOnly().MySelect(i => i * 2);
             Assert.Throws<InvalidOperationException>(() => empty.Last());
             Assert.Equal(0, empty.LastOrDefault());
             Assert.Throws<InvalidOperationException>(() => empty.Skip(1).Last());
@@ -1250,21 +1257,21 @@ namespace System.Linq.Tests
         [Fact]
         public void Select_SourceIsArray_SkipRepeatCalls()
         {
-            var source = new[] { 1, 2, 3, 4 }.Select(i => i * 2).Skip(1);
+            var source = new[] { 1, 2, 3, 4 }.MySelect(i => i * 2).Skip(1);
             Assert.Equal(source, source);
         }
 
         [Fact]
         public void Select_SourceIsArraySkipSelect()
         {
-            var source = new[] { 1, 2, 3, 4 }.Select(i => i * 2).Skip(1).Select(i => i + 1);
+            var source = new[] { 1, 2, 3, 4 }.MySelect(i => i * 2).Skip(1).MySelect(i => i + 1);
             Assert.Equal(new[] { 5, 7, 9 }, source);
         }
 
         [Fact]
         public void Select_SourceIsArrayTakeTake()
         {
-            var source = new[] { 1, 2, 3, 4 }.Select(i => i * 2).Take(2).Take(1);
+            var source = new[] { 1, 2, 3, 4 }.MySelect(i => i * 2).Take(2).Take(1);
             Assert.Equal(new[] { 2 }, source);
             Assert.Equal(new[] { 2 }, source.Take(10));
         }
@@ -1275,28 +1282,28 @@ namespace System.Linq.Tests
             Assert.Equal(
                 3,
                 new List<int> { 1, 2, 3, 4 }
-                    .Select(i => i * 2)
+                    .MySelect(i => i * 2)
                     .Take(3)
                     .Count()
             );
             Assert.Equal(
                 4,
                 new List<int> { 1, 2, 3, 4 }
-                    .Select(i => i * 2)
+                    .MySelect(i => i * 2)
                     .Take(9)
                     .Count()
             );
             Assert.Equal(
                 2,
                 new List<int> { 1, 2, 3, 4 }
-                    .Select(i => i * 2)
+                    .MySelect(i => i * 2)
                     .Skip(2)
                     .Count()
             );
             Assert.Equal(
                 0,
                 new List<int> { 1, 2, 3, 4 }
-                    .Select(i => i * 2)
+                    .MySelect(i => i * 2)
                     .Skip(8)
                     .Count()
             );
@@ -1308,27 +1315,27 @@ namespace System.Linq.Tests
             Assert.Equal(
                 new[] { 2, 4, 6 },
                 new List<int> { 1, 2, 3, 4 }
-                    .Select(i => i * 2)
+                    .MySelect(i => i * 2)
                     .Take(3)
                     .ToArray()
             );
             Assert.Equal(
                 new[] { 2, 4, 6, 8 },
                 new List<int> { 1, 2, 3, 4 }
-                    .Select(i => i * 2)
+                    .MySelect(i => i * 2)
                     .Take(9)
                     .ToArray()
             );
             Assert.Equal(
                 new[] { 6, 8 },
                 new List<int> { 1, 2, 3, 4 }
-                    .Select(i => i * 2)
+                    .MySelect(i => i * 2)
                     .Skip(2)
                     .ToArray()
             );
             Assert.Empty(
                 new List<int> { 1, 2, 3, 4 }
-                    .Select(i => i * 2)
+                    .MySelect(i => i * 2)
                     .Skip(8)
                     .ToArray()
             );
@@ -1340,27 +1347,27 @@ namespace System.Linq.Tests
             Assert.Equal(
                 new[] { 2, 4, 6 },
                 new List<int> { 1, 2, 3, 4 }
-                    .Select(i => i * 2)
+                    .MySelect(i => i * 2)
                     .Take(3)
                     .ToList()
             );
             Assert.Equal(
                 new[] { 2, 4, 6, 8 },
                 new List<int> { 1, 2, 3, 4 }
-                    .Select(i => i * 2)
+                    .MySelect(i => i * 2)
                     .Take(9)
                     .ToList()
             );
             Assert.Equal(
                 new[] { 6, 8 },
                 new List<int> { 1, 2, 3, 4 }
-                    .Select(i => i * 2)
+                    .MySelect(i => i * 2)
                     .Skip(2)
                     .ToList()
             );
             Assert.Empty(
                 new List<int> { 1, 2, 3, 4 }
-                    .Select(i => i * 2)
+                    .MySelect(i => i * 2)
                     .Skip(8)
                     .ToList()
             );
@@ -1379,12 +1386,14 @@ namespace System.Linq.Tests
                 e => e.ToArray(),
                 e => e.ToList(),
                 e => new LinkedList<int>(e), // IList<T> that's not a List
-                e => e.Select(i => i) // Multiple Select() chains are optimized
+                e => e.MySelect(i => i) // Multiple Select() chains are optimized
             };
 
-            foreach (IEnumerable<int> equivalentSource in identityTransforms.Select(t => t(source)))
+            foreach (
+                IEnumerable<int> equivalentSource in identityTransforms.MySelect(t => t(source))
+            )
             {
-                IEnumerable<int> result = equivalentSource.Select(i => i);
+                IEnumerable<int> result = equivalentSource.MySelect(i => i);
                 using (IEnumerator<int> e = result.GetEnumerator())
                 {
                     while (e.MoveNext())
@@ -1406,7 +1415,7 @@ namespace System.Linq.Tests
         public void RunSelectorDuringCount(IEnumerable<int> source)
         {
             int timesRun = 0;
-            var selected = source.Select(i => timesRun++);
+            var selected = source.MySelect(i => timesRun++);
             selected.Count();
 
             Assert.Equal(source.Count(), timesRun);
@@ -1423,7 +1432,7 @@ namespace System.Linq.Tests
                 e => e.ToArray().Where(i => true),
                 e => e.ToList().Where(i => true),
                 e => new LinkedList<int>(e).Where(i => true),
-                e => e.Select(i => i),
+                e => e.MySelect(i => i),
                 e => e.Take(e.Count()),
                 e => e.ToArray(),
                 e => e.ToList(),
@@ -1434,7 +1443,7 @@ namespace System.Linq.Tests
 
             for (int i = 0; i <= 5; i++)
             {
-                var enumerable = Enumerable.Range(1, i).Select(_ => r.Next());
+                var enumerable = Enumerable.Range(1, i).MySelect(_ => r.Next());
 
                 foreach (var transform in transforms)
                 {
