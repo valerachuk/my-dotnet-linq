@@ -13,7 +13,19 @@ namespace MyLinq
             Func<TSource, TResult> selector
         )
         {
-            return Enumerable.Select(source, selector);
+            ArgumentNullException.ThrowIfNull(source);
+            ArgumentNullException.ThrowIfNull(selector);
+
+            return new EchoEnumerable<TResult>(() =>
+            {
+                var sourceEnumerator = source.GetEnumerator();
+                var enumerator = new MySelectEnumerator<TSource, TResult>(
+                    selector,
+                    sourceEnumerator
+                );
+
+                return enumerator;
+            });
         }
 
         public static IEnumerable<TResult> MySelect<TSource, TResult>(
